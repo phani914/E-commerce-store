@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce Store - Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-shopping-bag"></i>
+                <span>ShopHub</span>
+            </div>
+
+            <input type="checkbox" id="mobileMenuToggle" class="mobile-menu-input" aria-label="Toggle navigation menu">
+            <label for="mobileMenuToggle" class="mobile-menu-button">
+                <i class="fas fa-bars"></i>
+                <span>Menu</span>
+            </label>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link active">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">Contact</a>
+                </li>
+            </ul>
+
+            <div class="nav-icons">
+                <a href="products.html" class="nav-icon" title="Search">
+                    <i class="fas fa-search"></i>
+                </a>
+                <a href="cart.html" class="nav-icon cart-icon" title="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+
+            <div class="auth-actions">
+                <a href="#" class="auth-button">Sign In / Sign Up</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <div class="page-theme-switch">
+        <input type="checkbox" id="themeToggle" class="theme-input" aria-label="Toggle dark mode">
+        <label for="themeToggle" class="theme-toggle">
+            <i class="fas fa-sun"></i>
+            <span>Mode</span>
+            <i class="fas fa-moon"></i>
+        </label>
+    </div>
+
+    <!-- Products Section -->
+    <main>
+        <section class="featured-products">
+            <div class="section-header">
+                <h2>Our Products</h2>
+                <p>Browse our complete collection of quality items</p>
+            </div>
+            <div class="products-grid">
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/headphones.png" alt="Premium Wireless Headphones" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Premium Wireless Headphones</h3>
+                        <p>Electronics</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.8</span>
+                            <span>18 in stock</span>
+                        </div>
+                        <p class="card-text product-description">Immersive wireless audio with soft ear cushions, deep bass, and all-day comfort for work, travel, and downtime.</p>
+                        <p class="card-text product-price">₹6,699</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/water-bottle.png" alt="Stainless Steel Water Bottle" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Stainless Steel Water Bottle</h3>
+                        <p>Accessories</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.6</span>
+                            <span>32 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A sleek insulated bottle that keeps drinks cold or hot for hours with a leak-resistant lid and durable finish.</p>
+                        <p class="card-text product-price">₹2,099</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/running-shoes.png" alt="Running Shoes Pro" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Running Shoes Pro</h3>
+                        <p>Footwear</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.9</span>
+                            <span>12 in stock</span>
+                        </div>
+                        <p class="card-text product-description">Lightweight running shoes with responsive cushioning, breathable uppers, and supportive traction for everyday miles.</p>
+                        <p class="card-text product-price">₹8,399</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/tshirt.png" alt="Casual Cotton T-Shirt" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Casual Cotton T-Shirt</h3>
+                        <p>Clothing</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.5</span>
+                            <span>40 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A soft premium cotton tee with a relaxed fit, polished fabric texture, and easy styling for daily wear.</p>
+                        <p class="card-text product-price">₹2,499</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/phone-charger.png" alt="Portable Phone Charger" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Portable Phone Charger</h3>
+                        <p>Electronics</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.7</span>
+                            <span>25 in stock</span>
+                        </div>
+                        <p class="card-text product-description">Compact backup power with fast charging support, clear battery indicators, and a travel-ready slim profile.</p>
+                        <p class="card-text product-price">₹3,349</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/yoga-mat.png" alt="Yoga Mat Premium" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Yoga Mat Premium</h3>
+                        <p>Sports</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.6</span>
+                            <span>20 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A cushioned non-slip mat with a carry strap, built for stable stretching, yoga sessions, and floor workouts.</p>
+                        <p class="card-text product-price">₹3,799</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/desk-lamp.png" alt="Minimalist LED Desk Lamp" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Minimalist LED Desk Lamp</h3>
+                        <p>Home Office</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.7</span>
+                            <span>16 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A sleek adjustable lamp with warm-to-cool lighting, compact desk presence, and a refined matte finish.</p>
+                        <p class="card-text product-price">₹4,599</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/smart-watch.png" alt="Everyday Smart Watch" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Everyday Smart Watch</h3>
+                        <p>Electronics</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.8</span>
+                            <span>22 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A modern wearable with a bright display, comfortable sport band, and daily health and notification features.</p>
+                        <p class="card-text product-price">₹10,899</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/backpack.png" alt="Sleek Everyday Backpack" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Sleek Everyday Backpack</h3>
+                        <p>Accessories</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.6</span>
+                            <span>19 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A practical daily backpack with organized storage, padded straps, and a clean style for commute or travel.</p>
+                        <p class="card-text product-price">₹5,899</p>
+                    </div>
+                </div>
+                <div class="card product-card h-100">
+                    <div class="product-image">
+                        <img class="card-img-top" src="assets/images/coffee-mugs.png" alt="Ceramic Coffee Mug Set" loading="lazy">
+                    </div>
+                    <div class="card-body product-info">
+                        <h3 class="card-title">Ceramic Coffee Mug Set</h3>
+                        <p>Home Goods</p>
+                        <div class="product-meta">
+                            <span><i class="fas fa-star"></i> 4.5</span>
+                            <span>28 in stock</span>
+                        </div>
+                        <p class="card-text product-description">A modern two-mug set with comfortable handles, smooth ceramic finish, and calm colors for everyday coffee.</p>
+                        <p class="card-text product-price">₹2,899</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>About Us</h4>
+                <ul>
+                    <li><a href="#">Company Info</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Shipping Info</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Policies</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Return Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ShopHub. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
