@@ -175,11 +175,27 @@ function initFormValidation() {
             }
 
             const isNewsletter = form.classList.contains("newsletter-form");
+            const isSignIn = form.classList.contains("signin-form");
+            const isSignUp = form.classList.contains("signup-form");
             form.reset();
             clearFormValidation(form);
+            let toastTitle = "Message sent";
+            let toastMessage = "Thanks for contacting us. Our support team will get back to you soon.";
+
+            if (isNewsletter) {
+                toastTitle = "Subscription added";
+                toastMessage = "Thank you for subscribing to ShopHub updates.";
+            } else if (isSignIn) {
+                toastTitle = "Signed in";
+                toastMessage = "Welcome back. Your ShopHub account is ready.";
+            } else if (isSignUp) {
+                toastTitle = "Account created";
+                toastMessage = "Your ShopHub account details have been saved for this demo.";
+            }
+
             showToast(
-                isNewsletter ? "Subscription added" : "Message sent",
-                isNewsletter ? "Thank you for subscribing to ShopHub updates." : "Thanks for contacting us. Our support team will get back to you soon."
+                toastTitle,
+                toastMessage
             );
         });
 
@@ -192,7 +208,7 @@ function initFormValidation() {
 
 function getFormFields(form) {
     return Array.from(form.querySelectorAll("input, textarea, select"))
-        .filter(field => !["checkbox", "radio", "hidden", "submit", "button"].includes(field.type));
+        .filter(field => !["hidden", "submit", "button"].includes(field.type));
 }
 
 function validateForm(form) {
@@ -203,12 +219,21 @@ function validateField(field) {
     const value = field.value.trim();
     let message = "";
 
-    if (field.required && !value) {
+    if (field.type === "checkbox" && field.required && !field.checked) {
+        message = "Please confirm this option.";
+    } else if (field.required && !value) {
         message = "This field is required.";
     } else if (field.type === "email" && value && !isValidEmail(value)) {
         message = "Enter a valid email address.";
+    } else if (field.pattern && value && !(new RegExp(`^(?:${field.pattern})$`)).test(value)) {
+        message = "Enter a valid value.";
     } else if (field.minLength > 0 && value && value.length < field.minLength) {
         message = `Enter at least ${field.minLength} characters.`;
+    } else if (field.dataset.match) {
+        const matchField = document.getElementById(field.dataset.match);
+        if (matchField && value && value !== matchField.value.trim()) {
+            message = "Passwords do not match.";
+        }
     }
 
     setFieldValidationState(field, message);
@@ -227,16 +252,25 @@ function setFieldValidationState(field, message) {
         error = document.createElement("div");
         error.id = errorId;
         error.className = "form-error";
-        field.insertAdjacentElement("afterend", error);
+        const wrapper = field.closest(".auth-check");
+        if (wrapper) {
+            wrapper.insertAdjacentElement("afterend", error);
+        } else {
+            field.insertAdjacentElement("afterend", error);
+        }
     }
 
     if (message) {
         field.classList.add("is-invalid");
+        const wrapper = field.closest(".auth-check");
+        if (wrapper) wrapper.classList.add("is-invalid");
         field.setAttribute("aria-invalid", "true");
         field.setAttribute("aria-describedby", errorId);
         error.textContent = message;
     } else {
         field.classList.remove("is-invalid");
+        const wrapper = field.closest(".auth-check");
+        if (wrapper) wrapper.classList.remove("is-invalid");
         field.removeAttribute("aria-invalid");
         field.removeAttribute("aria-describedby");
         error.textContent = "";
