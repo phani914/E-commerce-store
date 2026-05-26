@@ -107,6 +107,7 @@ const PRODUCTS = [
 // 2. DOM CONTENT LOADING WRAPPER
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
+    initFormValidation();
     updateCartBadge();
 
     // Check current page context
@@ -159,7 +160,94 @@ function initTheme() {
     }
 }
 
-// 4. CART STORAGE INTERFACE
+// 4. SHARED FORM VALIDATION
+function initFormValidation() {
+    const forms = document.querySelectorAll("form");
+    forms.forEach(form => {
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+
+            const isValid = validateForm(form);
+            if (!isValid) {
+                const firstInvalid = form.querySelector(".is-invalid");
+                if (firstInvalid) firstInvalid.focus();
+                return;
+            }
+
+            const isNewsletter = form.classList.contains("newsletter-form");
+            form.reset();
+            clearFormValidation(form);
+            showToast(
+                isNewsletter ? "Subscription added" : "Message sent",
+                isNewsletter ? "Thank you for subscribing to ShopHub updates." : "Thanks for contacting us. Our support team will get back to you soon."
+            );
+        });
+
+        getFormFields(form).forEach(field => {
+            field.addEventListener("input", () => validateField(field));
+            field.addEventListener("blur", () => validateField(field));
+        });
+    });
+}
+
+function getFormFields(form) {
+    return Array.from(form.querySelectorAll("input, textarea, select"))
+        .filter(field => !["checkbox", "radio", "hidden", "submit", "button"].includes(field.type));
+}
+
+function validateForm(form) {
+    return getFormFields(form).map(field => validateField(field)).every(Boolean);
+}
+
+function validateField(field) {
+    const value = field.value.trim();
+    let message = "";
+
+    if (field.required && !value) {
+        message = "This field is required.";
+    } else if (field.type === "email" && value && !isValidEmail(value)) {
+        message = "Enter a valid email address.";
+    } else if (field.minLength > 0 && value && value.length < field.minLength) {
+        message = `Enter at least ${field.minLength} characters.`;
+    }
+
+    setFieldValidationState(field, message);
+    return !message;
+}
+
+function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function setFieldValidationState(field, message) {
+    const errorId = `${field.id || field.name}-error`;
+    let error = document.getElementById(errorId);
+
+    if (!error) {
+        error = document.createElement("div");
+        error.id = errorId;
+        error.className = "form-error";
+        field.insertAdjacentElement("afterend", error);
+    }
+
+    if (message) {
+        field.classList.add("is-invalid");
+        field.setAttribute("aria-invalid", "true");
+        field.setAttribute("aria-describedby", errorId);
+        error.textContent = message;
+    } else {
+        field.classList.remove("is-invalid");
+        field.removeAttribute("aria-invalid");
+        field.removeAttribute("aria-describedby");
+        error.textContent = "";
+    }
+}
+
+function clearFormValidation(form) {
+    getFormFields(form).forEach(field => setFieldValidationState(field, ""));
+}
+
+// 5. CART STORAGE INTERFACE
 function getCart() {
     try {
         const raw = localStorage.getItem("shophub_cart");
@@ -183,7 +271,7 @@ function updateCartBadge() {
     });
 }
 
-// 5. TOAST NOTIFICATION ENGINE
+// 6. TOAST NOTIFICATION ENGINE
 function showToast(title, message, iconClass = "fa-check-circle") {
     const container = document.getElementById("toastContainer");
     if (!container) return;
@@ -243,7 +331,7 @@ function showToast(title, message, iconClass = "fa-check-circle") {
     }, 4000);
 }
 
-// 6. PRODUCTS PAGE IMPLEMENTATION
+// 7. PRODUCTS PAGE IMPLEMENTATION
 function initProductsPage() {
     const searchInput = document.getElementById("productSearch");
     const categoryFilter = document.getElementById("categoryFilter");
