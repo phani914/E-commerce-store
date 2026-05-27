@@ -108,6 +108,7 @@ const PRODUCTS = [
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initFormValidation();
+    initAuthUi();
     updateCartBadge();
 
     // Check current page context
@@ -177,6 +178,14 @@ function initFormValidation() {
             const isNewsletter = form.classList.contains("newsletter-form");
             const isSignIn = form.classList.contains("signin-form");
             const isSignUp = form.classList.contains("signup-form");
+            const authResult = (isSignIn || isSignUp) ? handleAuthFormSubmission(form) : null;
+
+            if (authResult && !authResult.success) {
+                const firstInvalid = form.querySelector(".is-invalid");
+                if (firstInvalid) firstInvalid.focus();
+                return;
+            }
+
             form.reset();
             clearFormValidation(form);
             let toastTitle = "Message sent";
@@ -186,21 +195,30 @@ function initFormValidation() {
                 toastTitle = "Subscription added";
                 toastMessage = "Thank you for subscribing to ShopHub updates.";
             } else if (isSignIn) {
+                saveAuthSession(authResult.user);
                 toastTitle = "Signed in";
-                toastMessage = "Welcome back. Your ShopHub account is ready.";
+                toastMessage = `Welcome back, ${authResult.user.name.split(" ")[0]}.`;
             } else if (isSignUp) {
+                saveAuthSession(authResult.user);
                 toastTitle = "Account created";
-                toastMessage = "Your ShopHub account details have been saved for this demo.";
+                toastMessage = "Your ShopHub account has been created for this demo.";
             }
 
             showToast(
                 toastTitle,
                 toastMessage
             );
+
+            if (isSignIn || isSignUp) {
+                handlePostAuthCart();
+            }
         });
 
         getFormFields(form).forEach(field => {
-            field.addEventListener("input", () => validateField(field));
+            field.addEventListener("input", () => {
+                validateField(field);
+                validateDependentFields(field, form);
+            });
             field.addEventListener("blur", () => validateField(field));
         });
     });
@@ -225,10 +243,18 @@ function validateField(field) {
         message = "This field is required.";
     } else if (field.type === "email" && value && !isValidEmail(value)) {
         message = "Enter a valid email address.";
+    } else if (field.name === "name" && value && !isValidFullName(value)) {
+        message = "Enter a valid name using letters, spaces, apostrophes, hyphens, or periods.";
+    } else if (field.name === "phone" && value && !isValidPhone(value)) {
+        message = "Enter a valid 10-digit phone number.";
+    } else if (field.maxLength > 0 && value && value.length > field.maxLength) {
+        message = `Enter no more than ${field.maxLength} characters.`;
     } else if (field.pattern && value && !(new RegExp(`^(?:${field.pattern})$`)).test(value)) {
         message = "Enter a valid value.";
     } else if (field.minLength > 0 && value && value.length < field.minLength) {
         message = `Enter at least ${field.minLength} characters.`;
+    } else if (field.dataset.passwordStrength && value && !isStrongPassword(value)) {
+        message = "Use uppercase, lowercase, a number, and a symbol.";
     } else if (field.dataset.match) {
         const matchField = document.getElementById(field.dataset.match);
         if (matchField && value && value !== matchField.value.trim()) {
@@ -242,6 +268,26 @@ function validateField(field) {
 
 function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function isValidFullName(value) {
+    return /^[A-Za-z][A-Za-z\s'.-]{1,58}$/.test(value);
+}
+
+function isValidPhone(value) {
+    return value.replace(/\D/g, "").length === 10;
+}
+
+function isStrongPassword(value) {
+    return /[a-z]/.test(value) &&
+           /[A-Z]/.test(value) &&
+           /\d/.test(value) &&
+           /[^A-Za-z0-9]/.test(value);
+}
+
+function validateDependentFields(field, form) {
+    const dependentFields = getFormFields(form).filter(item => item.dataset.match === field.id && item.value.trim());
+    dependentFields.forEach(validateField);
 }
 
 function setFieldValidationState(field, message) {
@@ -281,7 +327,216 @@ function clearFormValidation(form) {
     getFormFields(form).forEach(field => setFieldValidationState(field, ""));
 }
 
-// 5. CART STORAGE INTERFACE
+// 5. AUTH SESSION INTERFACE
+const AUTH_ACCOUNTS_KEY = "shophub_accounts";
+const AUTH_USER_KEY = "shophub_user";
+
+function normalizeEmail(value) {
+    return value.trim().toLowerCase();
+}
+
+function getAuthAccounts() {
+    try {
+        const raw = localStorage.getItem(AUTH_ACCOUNTS_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        console.error("Failed to parse account local storage", e);
+        return [];
+    }
+}
+
+function saveAuthAccounts(accounts) {
+    localStorage.setItem(AUTH_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function findAuthAccount(email) {
+    const normalizedEmail = normalizeEmail(email);
+    return getAuthAccounts().find(account => account.email === normalizedEmail) || null;
+}
+
+function handleAuthFormSubmission(form) {
+    const isSignIn = form.classList.contains("signin-form");
+    const emailField = form.querySelector('input[name="email"]');
+    const passwordField = form.querySelector('input[name="password"]');
+    const email = normalizeEmail(emailField?.value || "");
+    const password = passwordField?.value || "";
+
+    if (isSignIn) {
+        const account = findAuthAccount(email);
+
+        if (!account || account.password !== password) {
+            setFieldValidationState(passwordField, "Email or password is incorrect.");
+            return { success: false };
+        }
+
+        return {
+            success: true,
+            user: {
+                name: account.name,
+                email: account.email,
+                mode: "signin"
+            }
+        };
+    }
+
+    const nameField = form.querySelector('input[name="name"]');
+    const phoneField = form.querySelector('input[name="phone"]');
+
+    if (findAuthAccount(email)) {
+        setFieldValidationState(emailField, "An account with this email already exists. Please sign in.");
+        return { success: false };
+    }
+
+    const account = {
+        name: nameField.value.trim().replace(/\s+/g, " "),
+        phone: phoneField.value.replace(/\D/g, ""),
+        email,
+        password,
+        createdAt: new Date().toISOString()
+    };
+
+    saveAuthAccounts([...getAuthAccounts(), account]);
+
+    return {
+        success: true,
+        user: {
+            name: account.name,
+            email: account.email,
+            mode: "signup"
+        }
+    };
+}
+
+function getAuthUser() {
+    try {
+        const raw = localStorage.getItem(AUTH_USER_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        console.error("Failed to parse user local storage", e);
+        return null;
+    }
+}
+
+function isSignedIn() {
+    const user = getAuthUser();
+    return Boolean(user && user.email);
+}
+
+function saveAuthSession(user) {
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify({
+        name: user.name,
+        email: normalizeEmail(user.email),
+        mode: user.mode,
+        signedInAt: new Date().toISOString()
+    }));
+    initAuthUi();
+}
+
+function signOut() {
+    localStorage.removeItem(AUTH_USER_KEY);
+    initAuthUi();
+    showToast("Signed out", "You have been signed out of your ShopHub account.", "fa-right-from-bracket");
+}
+
+function initAuthUi() {
+    const authButtons = document.querySelectorAll(".auth-button");
+    const user = getAuthUser();
+
+    authButtons.forEach(button => {
+        if (user?.email) {
+            button.textContent = user.name ? `Hi, ${user.name.split(" ")[0]}` : "My Account";
+            button.setAttribute("title", user.email);
+        } else {
+            button.textContent = "Sign In / Sign Up";
+            button.removeAttribute("title");
+        }
+    });
+
+    const accountPanel = document.getElementById("authAccountPanel");
+    const accountName = document.getElementById("authAccountName");
+    const accountEmail = document.getElementById("authAccountEmail");
+    const signOutBtn = document.getElementById("signOutBtn");
+
+    if (accountPanel) {
+        accountPanel.hidden = !user?.email;
+    }
+
+    if (accountName && user?.name) {
+        accountName.textContent = `Hi, ${user.name.split(" ")[0]}`;
+    }
+
+    if (accountEmail && user?.email) {
+        accountEmail.textContent = user.email;
+    }
+
+    if (signOutBtn && !signOutBtn.dataset.bound) {
+        signOutBtn.dataset.bound = "true";
+        signOutBtn.addEventListener("click", signOut);
+    }
+
+    const authHeader = document.querySelector(".auth-header");
+    if (!authHeader || !getPendingCartRequest()) return;
+
+    if (!document.querySelector(".auth-cart-notice")) {
+        const notice = document.createElement("div");
+        notice.className = "auth-cart-notice";
+
+        const icon = document.createElement("i");
+        icon.className = "fas fa-shopping-cart";
+        icon.setAttribute("aria-hidden", "true");
+        notice.appendChild(icon);
+
+        const text = document.createElement("span");
+        text.textContent = "Sign in or create an account to add your selected product to the cart.";
+        notice.appendChild(text);
+
+        authHeader.appendChild(notice);
+    }
+}
+
+function requestAuthForCart(product, quantity) {
+    localStorage.setItem("shophub_pending_cart", JSON.stringify({
+        id: product.id,
+        quantity,
+        returnTo: `${window.location.pathname.split("/").pop() || "products.html"}${window.location.search}`
+    }));
+    showToast("Sign In Required", "Please sign in or create an account before adding items to your cart.", "fa-user-lock");
+    setTimeout(() => {
+        window.location.href = "auth.html?intent=add-to-cart";
+    }, 700);
+}
+
+function getPendingCartRequest() {
+    try {
+        const raw = localStorage.getItem("shophub_pending_cart");
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        console.error("Failed to parse pending cart local storage", e);
+        return null;
+    }
+}
+
+function clearPendingCartRequest() {
+    localStorage.removeItem("shophub_pending_cart");
+}
+
+function handlePostAuthCart() {
+    const pendingCart = getPendingCartRequest();
+    if (!pendingCart) return;
+
+    const product = PRODUCTS.find(item => item.id === pendingCart.id);
+    clearPendingCartRequest();
+
+    if (product) {
+        addQuantityToCart(product, Number(pendingCart.quantity) || 1, { requireAuth: false, quiet: true });
+    }
+
+    setTimeout(() => {
+        window.location.href = "cart.html";
+    }, 900);
+}
+
+// 6. CART STORAGE INTERFACE
 function getCart() {
     try {
         const raw = localStorage.getItem("shophub_cart");
@@ -305,7 +560,7 @@ function updateCartBadge() {
     });
 }
 
-// 6. TOAST NOTIFICATION ENGINE
+// 7. TOAST NOTIFICATION ENGINE
 function showToast(title, message, iconClass = "fa-check-circle") {
     const container = document.getElementById("toastContainer");
     if (!container) return;
@@ -365,7 +620,7 @@ function showToast(title, message, iconClass = "fa-check-circle") {
     }, 4000);
 }
 
-// 7. PRODUCTS PAGE IMPLEMENTATION
+// 8. PRODUCTS PAGE IMPLEMENTATION
 function initProductsPage() {
     const searchInput = document.getElementById("productSearch");
     const categoryFilter = document.getElementById("categoryFilter");
@@ -541,7 +796,18 @@ function addToCart(product) {
     addQuantityToCart(product, 1);
 }
 
-function addQuantityToCart(product, quantity = 1) {
+function addQuantityToCart(product, quantity = 1, options = {}) {
+    const settings = {
+        requireAuth: true,
+        quiet: false,
+        ...options
+    };
+
+    if (settings.requireAuth && !isSignedIn()) {
+        requestAuthForCart(product, quantity);
+        return false;
+    }
+
     let cart = normalizeCart(getCart());
     const existingItem = cart.find(item => item.id === product.id);
     const currentQuantity = existingItem ? existingItem.quantity : 0;
@@ -561,7 +827,9 @@ function addQuantityToCart(product, quantity = 1) {
     saveCart(cart);
     updateCartBadge();
     const unitLabel = quantity > 1 ? `${quantity} units of ${product.title} have` : `${product.title} has`;
-    showToast("Added to Cart", `${unitLabel} been added to your cart.`, "fa-shopping-cart");
+    if (!settings.quiet) {
+        showToast("Added to Cart", `${unitLabel} been added to your cart.`, "fa-shopping-cart");
+    }
     return true;
 }
 
@@ -597,7 +865,7 @@ function closeQuickView() {
     modal.classList.remove("active");
 }
 
-// 7. PRODUCT DETAIL PAGE IMPLEMENTATION
+// 9. PRODUCT DETAIL PAGE IMPLEMENTATION
 function initProductDetailPage() {
     const productId = new URLSearchParams(window.location.search).get("id") || PRODUCTS[0].id;
     const product = PRODUCTS.find(item => item.id === productId);
@@ -728,7 +996,7 @@ function setText(id, value) {
     if (element) element.textContent = value;
 }
 
-// 8. CART PAGE IMPLEMENTATION
+// 10. CART PAGE IMPLEMENTATION
 function initCartPage() {
     const checkoutBtn = document.getElementById("checkoutBtn");
     const clearCartBtn = document.getElementById("clearCartBtn");

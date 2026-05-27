@@ -83,6 +83,18 @@
                     <p>Track orders, save your cart, manage returns, and get faster checkout on every visit.</p>
                 </div>
 
+                <div class="auth-account-panel" id="authAccountPanel" hidden>
+                    <div>
+                        <span class="section-kicker">Signed In</span>
+                        <h2 id="authAccountName">Your account is active</h2>
+                        <p id="authAccountEmail"></p>
+                    </div>
+                    <div class="auth-account-actions">
+                        <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+                        <button type="button" class="btn btn-secondary" id="signOutBtn">Sign Out</button>
+                    </div>
+                </div>
+
                 <div class="row g-4 align-items-stretch">
                     <div class="col-12 col-lg-5">
                         <form class="auth-card signin-form h-100" novalidate>
@@ -96,12 +108,12 @@
 
                             <div class="auth-field">
                                 <label for="signinEmail">Email</label>
-                                <input type="email" id="signinEmail" name="email" placeholder="you@example.com" required>
+                                <input type="email" id="signinEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
                             </div>
 
                             <div class="auth-field">
                                 <label for="signinPassword">Password</label>
-                                <input type="password" id="signinPassword" name="password" placeholder="Enter your password" minlength="6" required>
+                                <input type="password" id="signinPassword" name="password" placeholder="Enter your password" autocomplete="current-password" minlength="8" required>
                             </div>
 
                             <div class="auth-options">
@@ -130,31 +142,32 @@
                                 <div class="col-12 col-md-6">
                                     <div class="auth-field">
                                         <label for="signupName">Full Name</label>
-                                        <input type="text" id="signupName" name="name" placeholder="Your name" minlength="2" required>
+                                        <input type="text" id="signupName" name="name" placeholder="Your name" autocomplete="name" minlength="2" maxlength="60" required>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="auth-field">
                                         <label for="signupPhone">Phone</label>
-                                        <input type="tel" id="signupPhone" name="phone" placeholder="98765 43210" pattern="[0-9 ]{10,14}" required>
+                                        <input type="tel" id="signupPhone" name="phone" placeholder="98765 43210" autocomplete="tel" inputmode="tel" required>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="auth-field">
                                         <label for="signupEmail">Email</label>
-                                        <input type="email" id="signupEmail" name="email" placeholder="you@example.com" required>
+                                        <input type="email" id="signupEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="auth-field">
                                         <label for="signupPassword">Password</label>
-                                        <input type="password" id="signupPassword" name="password" placeholder="At least 6 characters" minlength="6" required>
+                                        <input type="password" id="signupPassword" name="password" placeholder="At least 8 characters" autocomplete="new-password" minlength="8" data-password-strength="true" required>
+                                        <p class="auth-hint">Use uppercase, lowercase, a number, and a symbol.</p>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="auth-field">
                                         <label for="signupConfirmPassword">Confirm Password</label>
-                                        <input type="password" id="signupConfirmPassword" name="confirmPassword" placeholder="Re-enter password" minlength="6" data-match="signupPassword" required>
+                                        <input type="password" id="signupConfirmPassword" name="confirmPassword" placeholder="Re-enter password" autocomplete="new-password" minlength="8" data-match="signupPassword" required>
                                     </div>
                                 </div>
                                 <div class="col-12">

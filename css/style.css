@@ -1444,6 +1444,59 @@ body.dark-theme .mobile-menu-button:active {
     margin: 0;
 }
 
+.auth-cart-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 1.2rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--primary-color) 10%, var(--surface-color));
+    color: var(--dark-color);
+    font-weight: 700;
+}
+
+.auth-cart-notice i {
+    color: var(--primary-color);
+}
+
+.auth-account-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--secondary-color) 38%, var(--border-color));
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--secondary-color) 10%, var(--surface-color));
+    box-shadow: var(--shadow);
+}
+
+.auth-account-panel[hidden] {
+    display: none;
+}
+
+.auth-account-panel h2 {
+    color: var(--dark-color);
+    font-size: 1.35rem;
+    margin: 0.25rem 0;
+}
+
+.auth-account-panel p {
+    color: var(--muted-color);
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.auth-account-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 0 0 auto;
+}
+
 .auth-card {
     display: flex;
     flex-direction: column;
@@ -1513,6 +1566,13 @@ body.dark-theme .mobile-menu-button:active {
 .auth-field input:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(83, 213, 203, 0.16);
+}
+
+.auth-hint {
+    margin: 0.4rem 0 0;
+    color: var(--muted-color);
+    font-size: 0.86rem;
+    line-height: 1.35;
 }
 
 .auth-field input.is-invalid {
@@ -2199,6 +2259,16 @@ body.dark-theme .mobile-menu-button:active {
 
     .auth-card {
         padding: 1.1rem;
+    }
+
+    .auth-account-panel,
+    .auth-account-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .auth-account-actions {
+        width: 100%;
     }
 
     .auth-card-header {
